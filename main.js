@@ -1,10 +1,9 @@
 import Game from "./game.js";
 
-var canvas = document.createElement("canvas");
+var canvas = document.getElementById("canvas");
 canvas.width = 1000;
 canvas.height = 480;
 canvas.style.border = "1px solid black";
-document.body.appendChild(canvas);
 window.AudioContext = window.AudioContext||window.webkitAudioContext;
 
 var ctx = canvas.getContext("2d");
