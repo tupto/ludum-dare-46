@@ -1,30 +1,41 @@
+import Game from "./game.js";
+
 var canvas = document.createElement("canvas");
-canvas.width = 512;
+canvas.width = 1000;
 canvas.height = 480;
-document.appendChild(canvas);
+canvas.style.border = "1px solid black";
+document.body.appendChild(canvas);
+window.AudioContext = window.AudioContext||window.webkitAudioContext;
 
 var ctx = canvas.getContext("2d");
-
-var pressedKeys = {};
-canvas.addEventListener("keydown", (e) => {
-  keyboard[e.charCode] = true;
-}, false);
-canvas.addEventListener("keyup", (e) => {
-  delete keyboard[e.charCode];
-}, false);
-
-var mouse = { x: 0, y: 0, leftClickDown: false, rightClickDown: false }
-canvas.addEventListener("mousemove", (e) => {
-  let canvasBB = canvas.getBoundingClientRect();
-  mouse.x = e.clientX - canvasBB.x;
-  mouse.y = e.clientY - canvasBB.y;
-}, false);
-canvas.addEventListener("click", (e) => {
-  mouse.leftClickDown = e.button === 0;
-  mouse.rightClickDown = e.button === 2;
-}, false);
+var game = new Game(ctx);
 
 var prevTime = Date.now();
+
+window.pressedKeys = {};
+addEventListener("keydown", (e) => {
+  window.pressedKeys[e.keyCode] = true;
+}, false);
+addEventListener("keyup", (e) => {
+  delete window.pressedKeys[e.keyCode];
+}, false);
+
+window.mouse = { x: 0, y: 0, leftClickDown: false, rightClickDown: false }
+canvas.addEventListener("mousemove", (e) => {
+  let canvasBB = canvas.getBoundingClientRect();
+  window.mouse.x = e.clientX - canvasBB.x;
+  window.mouse.y = e.clientY - canvasBB.y;
+}, false);
+canvas.addEventListener("click", (e) => {
+  e.preventDefault();
+  window.mouse.leftClickDown = e.button === 0;
+  window.mouse.rightClickDown = e.button === 2;
+}, false);
+
+function init() {
+  game.init();
+}
+
 /**
  * Main game loop
  */
@@ -36,8 +47,6 @@ function main() {
   render();
 
   prevTime = now;
-
-  requestAnimationFrame(main);
 }
 
 /**
@@ -45,49 +54,15 @@ function main() {
  * @param {number} deltaTime 
  */
 function update(deltaTime) {
-
+  game.update(deltaTime);
 }
 
 /**
  * Render the game
  */
 function render() {
-
+  game.render();
 }
 
-/**
- * Load an image
- * @param {string} fileName 
- * @returns {Promise<HTMLImageElement>}
- */
-function loadImage(fileName) {
-  return new Promise((resolve, reject) => {
-    var img = new Image();
-
-    img.onload = (e) => { resolve(img); }
-    img.onerror = (e) => { reject(e); }
-
-    img.src = fileName;
-  });
-}
-
-/**
- * Load a sound
- * @param {string} fileName 
- * @returns {Promise<HTMLAudioElement>}
- */
-function loadSound(fileName) {
-  return new Promise((resolve, reject) => {
-    var audio = new Audio();
-    audio.setAttribute("preload", "auto");
-    audio.setAttribute("controls", "none");
-    audio.style.display = "none";
-
-    audio.onload = (e) => { resolve(audio); }
-    audio.onerror = (e) => { reject(e); }
-
-    audio.src = fileName;
-
-    document.appendChild(audio);
-  });
-}
+init();
+window.setInterval((main), 1000 / 60);
